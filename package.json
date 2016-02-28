@@ -1,0 +1,22 @@
+{
+  "name": "JSMVC",
+  "description": "Sample JS MVC Setup",
+  "version": "1.0.0",
+  "author" : "Corey Gaspard <cgaspard@gmail.com>",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "main": "app.js",
+  "repository": "git@git.mygait.com:cgaspard/jsmvc.git",
+  "private": false,
+  "contributors": [
+    {
+      "name":"Corey Gaspard",
+      "email": "cgaspard@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "seemless": "*",
+    "restify": "*"
+  }
+}

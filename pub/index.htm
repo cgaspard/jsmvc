@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head id="mvc-csscontainer">
+    <title>testMVC Test</title>
+    <!-- pure js engine, which works with mvc -->
+    <script src="/libs/pure.min.js" type="text/javascript"></script>
+    <script src="/libs/mvc.js" type="text/javascript"></script>
+    <script src="/controller.js" type="text/javascript"></script>
+    <script>
+
+    var testMVC = null;
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+
+      var mvcOptions = {
+        views: ["/views/home.js", "/views/today.js"],
+        models: ["/models/home.js", "/models/today.js"]
+      }
+
+      testMVC = new MVC(mvcOptions);
+      testMVC.addObserver({
+        "type": "PreloadComplete",
+        "notify": function(type, data) {
+
+        }
+      });
+      Controller.init(document.getElementById("mvc-screens"), document.getElementById("mvc-csscontainer"), testMVC);
+      testMVC.init(Controller);
+
+    });
+
+    </script>
+  </head>
+  <body>
+    <button onclick="Controller.displayHomeScreen();">Show Home</button>
+    <button onclick="Controller.displayTodayScreen();">Show Today</button>
+    <div id="mvc-screens">
+
+    </div>
+
+  </body>
+</html>
