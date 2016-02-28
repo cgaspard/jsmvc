@@ -7,28 +7,20 @@
     <script src="/libs/mvc.js" type="text/javascript"></script>
     <script src="/controller.js" type="text/javascript"></script>
     <script>
-
     var testMVC = null;
-
     document.addEventListener("DOMContentLoaded", function(event) {
-
       var mvcOptions = {
         views: ["/views/home.js", "/views/today.js"],
         models: ["/models/home.js", "/models/today.js"]
       }
-
       testMVC = new MVC(mvcOptions);
       testMVC.addObserver({
         "type": "PreloadComplete",
-        "notify": function(type, data) {
-
-        }
+        "notify": function(type, data) { }
       });
       Controller.init(document.getElementById("mvc-screens"), document.getElementById("mvc-csscontainer"), testMVC);
       testMVC.init(Controller);
-
     });
-
     </script>
   </head>
   <body>
