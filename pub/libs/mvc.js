@@ -218,10 +218,7 @@ MVC.prototype.getContent = function(url, callBack) {
 }
 
 /// View interface
-var View = function() {
-  view = this;
-  view.dom = null;
-};
+var View = function() { };
 
 View.prototype.render = function(model, callBack) {
   var view = this;

@@ -1,30 +1,29 @@
+/// Ineherit View object
+homeView.prototype = Object.create(View.prototype);
+homeView.prototype.constructor = homeView;
+
 function homeView() {
   var view = this;
 
-  /// Make home view an instance of MVC view
-  View.call(this);
+  /// Call super constructor
+  View.call(view);
+
   view.id = "home";
-  view.dom = null;
   view.engine = "pure";
+  view.html = "/views/home.htm";
   view.directive = {
     ".userName": "name",
     ".userAge": "age",
     "#combined": "#{name} - #{age}"
   };
-  view.html = "/views/home.htm";
-  view.css = "";
 }
-/// Required to ineherit View poperly
-homeView.prototype = Object.create(View.prototype);
-homeView.prototype.constructor = homeView;
 
-/// The data is available, the dom is loaded, so populated it
+/// Auto rendering via template engine happens first, this is where you can do stuff after that
 homeView.prototype.postrender = function(model, callBack) {
   view = this;
-  console.log("Rendering " + view.id + " view, Model: " + model.id);
+
   var testDiv = document.createElement("div");
   testDiv.innerHTML = 'Hello There from Render Function';
-
   view.dom.appendChild(testDiv);
 
   callBack(view.dom);

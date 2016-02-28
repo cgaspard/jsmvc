@@ -13,7 +13,7 @@ var Controller = {
 
     Controller.mvc.clearCSSImports();
 
-    if(viewObject.css.length > 0) {
+    if(viewObject.css !== undefined && viewObject.css.length > 0) {
       Controller.importCSS(viewObject.css);
     }
 
