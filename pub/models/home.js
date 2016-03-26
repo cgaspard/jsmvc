@@ -3,9 +3,8 @@ var homeModel = {
   load: function(callBack) {
     model = this;
     model.data = {
-      "name":"test",
-      "age":55,
-      "class@name":"et-username"
+      "name":"David",
+      "age":55
     }
     callBack(model);
   }

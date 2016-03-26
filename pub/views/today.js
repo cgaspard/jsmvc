@@ -25,6 +25,8 @@ todayView.prototype.postrender = function(model, callBack) {
   view.dom.querySelector("#hours").innerHTML = model.data.hours;
   view.dom.querySelector("#minutes").innerHTML = model.data.minutes;
 
+  view.dom.querySelector("#helloMessageContainer").innerHTML = model.data.helloMessage;
+
   callBack(view.dom);
 };
 

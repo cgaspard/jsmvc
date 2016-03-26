@@ -8,7 +8,8 @@ var todayModel = {
       "month": today.getMonth()+1,
       "date": today.getDate(),
       "hours": today.getHours(),
-      "minutes": today.getMinutes()
+      "minutes": today.getMinutes(),
+      "helloMessage": "Whats up doc?"
     }
     callBack(model);
   }
