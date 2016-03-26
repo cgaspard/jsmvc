@@ -38,7 +38,7 @@ The MVC library doesn't really care how you setup your folder structure, but her
 
 Models in JS MVC load data, and house it.  Views process that data and render to an in memory DOM.   The controller is responsible for taking rendered html, and inserting into the page DOM.
 
-Here is a sample Model JS:
+#### Here is a sample Model JS:
 ``` Javascript
 var todayModel = {
   id: "today",
@@ -60,7 +60,7 @@ Model.call(todayModel);
 })();
 ```
 
-Views Contain JS and HTML  Here is sample JS for the View:
+#### Views Contain JS and HTML  Here is sample JS for the View:
 ``` Javascript
 /// Inherit View object
 todayView.prototype = Object.create(View.prototype);
@@ -92,7 +92,7 @@ todayView.prototype.postrender = function(model, callBack) {
   return new todayView();
 })();
 ```
-Here is a matching HTML for the todayView:
+#### Here is a matching HTML for the todayView:
 ``` html
 <html>
   <head>
@@ -107,5 +107,91 @@ Here is a matching HTML for the todayView:
 
   </div>
 </body>
+</html>
+```
+
+### Putting it together
+
+#### The Index Page
+
+This is how to initialize the MVC and display some views.  The sample node project actually uses a custom controller class which you can see in the source.  The controller should be utilized to consolidate navigation code.   We'll let the index page function as our controller in this example though.
+``` html
+<!DOCTYPE html>
+<html lang="en">
+  <head id="mvc-csscontainer">
+    <title>MVC Test</title>
+    <script src="/libs/mvc.js" type="text/javascript"></script>
+    <script>
+    var mvc = null;
+    document.addEventListener("DOMContentLoaded", function(event) {
+      var mvcOptions = {
+        views: ["/views/home.js", "/views/today.js"],
+        models: ["/models/home.js", "/models/today.js"]
+      }
+      mvc = new MVC(mvcOptions);
+      mvc.init(/* controller, callback */);
+      /// This is how you can be notified of MVC events
+      mvc.addObserver({
+        "type": "PreloadComplete",
+        "notify": function(type, data) { }
+      });
+    });
+
+    function doneRendering(err, viewRendered) {
+      if(err) {
+      } else {
+        document.getElementById("mvc-screens").innerHTML = "";
+        viewRendered.dom = document.getElementById("mvc-screens").appendChild(viewRendered.dom);
+      }
+    }
+    function displayToday() {
+      var viewObject = mvc.getView("today");
+      var modelObject = mvc.getModel("today");
+      /// Loads the model for a view
+      modelObject.load(function(returnedModel) {
+        /// We now have the data we want, so lets put it into the view
+        viewObject.render(returnedModel, doneRendering);
+      });
+    }
+    function displayHome() {
+      var viewObject = mvc.getView("home");
+      var modelObject = mvc.getModel("home");
+      /// Loads the model for a view
+      modelObject.load(function(returnedModel) {
+        /// We now have the data we want, so lets put it into the view
+        viewObject.render(returnedModel, doneRendering);
+      });
+    }
+    </script>
+  </head>
+  <body>
+    <button onclick="Controller.displayToday();">Show Today</button>
+    <button onclick="Controller.displayHome();">Show Home</button>
+    <div id="mvc-screens">
+    </div>
+  </body>
+</html>
+```
+
+Clicking "Show Today" button would then load the model, then pass the model to the view and let the view render into the view.dom object.   From there, we insert that into the mvc-screens div.   Output from the above sample would be:
+
+``` html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ...  removed for readability ... -->
+  </head>
+  <body>
+    <button onclick="Controller.displayToday();">Show Today</button>
+    <button onclick="Controller.displayHome();">Show Home</button>
+    <div id="mvc-screens">
+      <div id="todayScreen" class="mvc-template">
+        <div class="jumbotron">
+          <h1 id="helloMessageContainer">Whats up doc?</h1>
+          <p></p>
+        </div>
+        <div>Hello There from Render Function of Today</div>     
+    </div>
+  </body>
 </html>
 ```

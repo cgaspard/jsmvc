@@ -43,6 +43,9 @@ MVC.prototype.__defineGetter__("isInitDone", function() {
 
 MVC.prototype.init = function(controller, callBack) {
   var mvc = this;
+  if(controller === undefined) {
+    controller = {};
+  }
   mvc.controller = controller;
 
   if (callBack === undefined) {
