@@ -26,7 +26,7 @@ homeView.prototype.postrender = function(model, callBack) {
   testDiv.innerHTML = 'Hello There from Render Function';
   view.dom.appendChild(testDiv);
 
-  callBack(view.dom);
+  callBack(null, view);
 };
 
 (function() {

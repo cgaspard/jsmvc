@@ -27,13 +27,14 @@ var Controller = {
       }
     }(viewObject));
 
-    function doneRendering(domObject) {
-
-      viewObject.dom = Controller.screenContainer.appendChild(domObject);
-      viewObject.dom.style.display = 'block';
-
-      console.log("Done rendering: " + viewObject.id);
-
+    function doneRendering(err, viewRendered) {
+      if(err) {
+        alert("Error Loading View: " + err);
+        console.log("Error Loading View: " + err);
+      } else {
+        viewRendered.dom = Controller.screenContainer.appendChild(viewRendered.dom);
+        console.log("Done rendering: " + viewObject.id);
+      }
     }
   },
 

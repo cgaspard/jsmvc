@@ -27,7 +27,7 @@ todayView.prototype.postrender = function(model, callBack) {
 
   view.dom.querySelector("#helloMessageContainer").innerHTML = model.data.helloMessage;
 
-  callBack(view.dom);
+  callBack(null, view);
 };
 
 (function() {
