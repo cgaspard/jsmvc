@@ -125,8 +125,8 @@ This is how to initialize the MVC and display some views.  The sample node proje
     var mvc = null;
     document.addEventListener("DOMContentLoaded", function(event) {
       var mvcOptions = {
-        views: ["/views/home.js", "/views/today.js"],
-        models: ["/models/home.js", "/models/today.js"]
+        views: ["MVC/Views/home.js", "MVC/Views/today.js"],
+        models: ["MVC/Models/home.js", "MVC/Models/today.js"]
       }
       mvc = new MVC(mvcOptions);
       mvc.init(/* controller, callback */);
