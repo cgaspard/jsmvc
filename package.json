@@ -7,7 +7,7 @@
     "start": "node app.js"
   },
   "main": "app.js",
-  "repository": "git@git.mygait.com:cgaspard/jsmvc.git",
+  "repository": "git@github.com:cgaspard/jsmvc.git",
   "private": false,
   "contributors": [
     {
