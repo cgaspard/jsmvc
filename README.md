@@ -165,8 +165,8 @@ This is how to initialize the MVC and display some views.  The sample node proje
     </script>
   </head>
   <body>
-    <button onclick="Controller.displayToday();">Show Today</button>
-    <button onclick="Controller.displayHome();">Show Home</button>
+    <button onclick="displayToday();">Show Today</button>
+    <button onclick="displayHome();">Show Home</button>
     <div id="mvc-screens">
     </div>
   </body>
@@ -182,8 +182,8 @@ Clicking "Show Today" button would then load the model, then pass the model to t
     <!-- ...  removed for readability ... -->
   </head>
   <body>
-    <button onclick="Controller.displayToday();">Show Today</button>
-    <button onclick="Controller.displayHome();">Show Home</button>
+    <button onclick="displayToday();">Show Today</button>
+    <button onclick="displayHome();">Show Home</button>
     <div id="mvc-screens">
       <div id="todayScreen" class="mvc-template">
         <div class="jumbotron">
