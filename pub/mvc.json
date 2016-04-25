@@ -1,0 +1,18 @@
+{
+    "mvcRoot": "/",
+    "autoInit": true,
+    "listenForHashChanges": true,
+    "screenContainerSelector": "#mvc-screens",
+    "cssContainerSelector": "#mvc-csscontainer",
+    "views": ["/views/home.js", "/views/today.js"],
+    "models": ["/models/home.js", "/models/today.js"],
+    "routes": [{
+        "pattern": "#home",
+        "view": "home",
+        "model": "home"
+    }, {
+        "pattern": "#today",
+        "view": "today",
+        "model": "today"
+    }]
+}

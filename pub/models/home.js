@@ -6,7 +6,7 @@ var homeModel = {
       "name":"David",
       "age":55
     }
-    callBack(model);
+    callBack(null, model);
   }
 };
 

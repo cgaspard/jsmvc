@@ -11,7 +11,7 @@ var todayModel = {
       "minutes": today.getMinutes(),
       "helloMessage": "Whats up doc?"
     }
-    callBack(model);
+    callBack(null, model);
   }
 };
 

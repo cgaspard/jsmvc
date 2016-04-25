@@ -6,28 +6,20 @@
     <script src="/libs/pure.min.js" type="text/javascript"></script>
     <script src="/libs/async.min.js" type="text/javascript"></script>
     <script src="/libs/mvc.js" type="text/javascript"></script>
-    <script src="/controller.js" type="text/javascript"></script>
     <script>
     var mvc = null;
     document.addEventListener("DOMContentLoaded", function(event) {
-      var mvcOptions = {
-        views: ["/views/home.js", "/views/today.js"],
-        models: ["/models/home.js", "/models/today.js"]
-      }
-      mvc = new MVC(mvcOptions);
-      mvc.addObserver({
-        "type": "PreloadComplete",
-        "notify": function(type, data) { }
+      mvc = new MVC("/mvc.json");
+      mvc.on("preloadcomplete", function() {
+        console.log("Done preloading")
       });
-      Controller.init(document.getElementById("mvc-screens"),
-       document.getElementById("mvc-csscontainer"), mvc);
-      mvc.init(Controller);
-    });
+    })
     </script>
   </head>
   <body>
-    <button onclick="Controller.displayHomeScreen();">Show Home - (Uses Pure.js Engine)</button>
-    <button onclick="Controller.displayTodayScreen();">Show Today - (Uses DOM Manipulation)</button>
+    <a href="#home" >Show Home - (Uses Pure.js Engine)</a>
+    <br>
+    <a href="#today">Show Today - (Uses DOM Manipulation)</a>
     <div id="mvc-screens">
 
     </div>
