@@ -1,7 +1,7 @@
 {
   "name": "JSMVC",
   "description": "Sample JS MVC Setup",
-  "version": "1.0.1",
+  "version": "1.5.0",
   "author" : "Corey Gaspard <cgaspard@gmail.com>",
   "scripts": {
     "start": "node app.js"
@@ -16,7 +16,6 @@
     }
   ],
   "dependencies": {
-    "seemless": "*",
     "restify": "*"
   }
 }
