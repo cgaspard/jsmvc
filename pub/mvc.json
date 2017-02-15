@@ -2,17 +2,22 @@
     "mvcRoot": "/",
     "autoInit": true,
     "listenForHashChanges": true,
+    "loadHashOnInit": true,
     "screenContainerSelector": "#mvc-screens",
     "cssContainerSelector": "#mvc-csscontainer",
-    "views": ["/views/home.js", "/views/today.js"],
-    "models": ["/models/home.js", "/models/today.js"],
+    "views": ["/mvc/home.view.js", "/mvc/today.view.js", "/mvc/handle.view.js"],
+    "models": ["/mvc/home.model.js", "/mvc/today.model.js", "/mvc/handle.model.js"],
     "routes": [{
-        "pattern": "#home",
+        "pattern": "#home/:id/test/:name",
         "view": "home",
         "model": "home"
     }, {
         "pattern": "#today",
         "view": "today",
         "model": "today"
+    }, {
+        "pattern": "#handle",
+        "view": "handle",
+        "model": "handle"
     }]
 }
