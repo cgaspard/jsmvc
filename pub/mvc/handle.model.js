@@ -1,11 +1,15 @@
 
-model.id = "handle";
+this.id = "handle";
 
-model.load = function(callBack) {
+this.load = function(callBack) {
   var model = this;
   model.data = {
     "title":"Handlebars works",
-    "body": "This is some text."
+    "body": "This is some text.",
+    "functionname": "mvc.view.dosomething"
   }
   callBack(null, model);
 }
+
+
+

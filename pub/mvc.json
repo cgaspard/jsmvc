@@ -5,6 +5,7 @@
     "loadHashOnInit": true,
     "screenContainerSelector": "#mvc-screens",
     "cssContainerSelector": "#mvc-csscontainer",
+    "templateSelector": ".mvc-template",
     "views": ["/mvc/home.view.js", "/mvc/today.view.js", "/mvc/handle.view.js"],
     "models": ["/mvc/home.model.js", "/mvc/today.model.js", "/mvc/handle.model.js"],
     "routes": [{

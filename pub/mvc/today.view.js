@@ -1,20 +1,21 @@
 
-view.id = "today";
-view.html = "/mvc/today.htm";
+this.id = "today";
+this.html = "/mvc/today.htm";
+this.title = "Today";
 
 /// Auto rendering via template engine happens first, this is where you can do stuff after that
-view.addEventListener("load", function() {
-  var view = this;
+this.addEventListener("load", function() {
+  // var this = this;
   var testDiv = document.createElement("div");
   testDiv.innerHTML = 'Hello There from Render Function of Today';
-  view.dom.appendChild(testDiv);
+  this.dom.appendChild(testDiv);
 
-  view.dom.querySelector("#year").innerHTML = view.model.data.year;
-  view.dom.querySelector("#month").innerHTML = view.model.data.month;
-  view.dom.querySelector("#date").innerHTML = view.model.data.date;
-  view.dom.querySelector("#hours").innerHTML = view.model.data.hours;
-  view.dom.querySelector("#minutes").innerHTML = view.model.data.minutes;
+  this.dom.querySelector("#year").innerHTML = this.model.data.year;
+  this.dom.querySelector("#month").innerHTML = this.model.data.month;
+  this.dom.querySelector("#date").innerHTML = this.model.data.date;
+  this.dom.querySelector("#hours").innerHTML = this.model.data.hours;
+  this.dom.querySelector("#minutes").innerHTML = this.model.data.minutes;
 
-  view.dom.querySelector("#helloMessageContainer").innerHTML = view.model.data.helloMessage;
+  this.dom.querySelector("#helloMessageContainer").innerHTML = this.model.data.helloMessage;
 
 });

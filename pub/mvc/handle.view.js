@@ -6,3 +6,7 @@ view.html = "/mvc/handle.htm";
 view.addEventListener("load", function() {
 
 });
+
+view.dosomething = function() {
+    alert("test");
+};

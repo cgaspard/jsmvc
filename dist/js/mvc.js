@@ -1,9 +1,10 @@
 /// MVC library
+/// Version 1.5.1
 
 // @auto-fold here
 var MVC = function (options) {
   mvc = this;
-  mvc.version = "1.0.1";
+  mvc.version = "1.5.1";
 
   if (async === undefined) {
     var asyncErr = new Error("async library required for MVC");
@@ -11,6 +12,9 @@ var MVC = function (options) {
   }
   if ($p === undefined) {
     console.log("Warning: pure.js is not loaded, please load if you want to use pure.js template engine");
+  }
+  if(Handlebars === undefined) {
+    console.log("Warning: Handlebars is not loaded, please load if you want to use handlebars template engine");
   }
 
   mvc.views = [];
@@ -21,7 +25,7 @@ var MVC = function (options) {
       if (err) {
         var optionsError = new Error("MVC bad config file");
       } else {
-        options = JSON.parse(result);
+        options = typeof(result) === "object" ? result : JSON.parse(result);
         finishConstructor();
       }
     });
@@ -50,18 +54,10 @@ var MVC = function (options) {
     if (mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true) {
       mvc.controller.listenForHashChanges(window);
     }
-
     if (mvc.options.autoInit === undefined || mvc.options.autoInit === true) {
       mvc.init();
     }
   }
-};
-
-MVC.prototype.addEventListener = function(topic, callBack) {
-  this.addObserver({
-    "type": topic,
-    "notify": callBack
-  })  
 };
 
 // @auto-fold here
@@ -70,7 +66,7 @@ MVC.prototype.on = function (topic, callBack) {
     "type": topic,
     "notify": callBack
   })
-};
+}
 
 // @auto-fold here
 MVC.prototype.addObserver = function (observer) {
@@ -79,23 +75,14 @@ MVC.prototype.addObserver = function (observer) {
 
 // @auto-fold here
 MVC.prototype.emit = function (type, data) {
-  try {
-    for (var i = 0; i < this.observers.length; i++) {
-      var observer = this.observers[i];
-      if (observer.type === undefined) {
-        observer.notify(type, data);
-      } else if (observer.type === type || observer.type === null || observer.type === "") {
-        observer.notify(type, data);
-      }
+  for (var i = 0; i < this.observers.length; i++) {
+    var observer = this.observers[i];
+    if (observer.type === undefined) {
+      observer.notify(type, data);
+    } else if (observer.type === type || observer.type === null || observer.type === "") {
+      observer.notify(type, data);
     }
-  } catch (ex) {
-    if(!console.error) {
-      console.error = console.log;
-    }
-    console.log("MVC Captured error:");
-    console.error(ex);
   }
-
 };
 
 // @auto-fold here
@@ -164,7 +151,9 @@ MVC.prototype.init = function (callBack) {
         if (doneCallback !== undefined) {
           doneCallback();
         }
-
+        if(mvc.options.loadHashOnInit) {
+          mvc.controller.onhashchange();
+        }
       }
     }
   }(callBack));
@@ -251,7 +240,7 @@ MVC.prototype.addModel = function (jsfile, callBack) {
         throw err;
       } else {
         result += "\r\n//# sourceURL=" + document.location.origin + jsfile;
-        var model = eval(result);
+        var model = new Model(result);
         model.jsfile = innerJSFile;
         model.mvc = mvc;
         mvc.models.push(model);
@@ -287,7 +276,8 @@ MVC.prototype.addView = function (jsfile, callBack) {
         throw err;
       } else {
         result += "\r\n//# sourceURL=" + document.location.origin + jsfile;
-        var view = eval(result);
+        var view = new View(result);
+        //var view = eval(result);
         view.jsfile = innerJSFile;
         view.mvc = mvc;
 
@@ -305,8 +295,8 @@ MVC.prototype.addView = function (jsfile, callBack) {
                 view.htmlText = htmlResult;
                 var tempDiv = document.createElement("div");
                 tempDiv.innerHTML = view.htmlText;
-                view.dom = tempDiv.querySelector(".mvc-template").cloneNode(true);
-                view.sourceDOM = tempDiv.querySelector(".mvc-template").cloneNode(true);
+                view.dom = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
+                view.sourceDOM = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
 
                 // We got the html, load it into an iFrame so we can clone it when we need to
                 // var templateIframe = document.createElement("iframe");
@@ -376,44 +366,63 @@ MVC.prototype.getContent = function (url, async, callBack) {
   }
 };
 
-/// View interface
+/**
+ * MVC Controller
+ * 
+ * The MVC Controller is reponsible for handling route / hash changes that would require view updates.
+ * 
+ * Events:
+ *  hashchanged(hashTag) - detected a hash tag navigation, try to navigate a view if its a registered url
+ *  hashchangenoroute(hashTag) - hash naviation didn't match any of the registered mvc routes
+ *  routeadded(routeObject) - new route added to controller
+ *  showviewstart(viewName) - a request to show a view has began
+ *  showviewdone(viewObject) - a view was sucessfully shown
+ *  loadmodelstart(modelObject) - a model is going to be loaded with data
+ *  loadmodeldone(modelObject) - a model sucessfully loaded
+ *  loadmodelerror(errorObject) - a model was not sucessfully loaded
+ *  renderviewstart(viewObject) - a view is going to be rendered with a mdoel
+ *  renderviewdone(viewObject) - a view was sucessfully rendered
+ *  renderviewerror(errorObject) - a view was not sucessfully rendered
+ *  displayviewstart(viewObject) - view was rendered, and now we're ready to show it on the screen
+ *  displayviewdone(viewObject) - we have sucessfully shown the view on the screen
+ *  displayviewerror(errorObject) - error while displaying view
+ *  displayviewrollbackstart(viewObject) - when we've had and error displaying, we show the previous one again
+ *  displayviewrollbackdone(viewObject) - done rolling back the display to the previous view
+ * 
+ * @param {any} controllerOptions 
+ * @param {any} controllerMVC 
+ * @returns 
+ */
 var MVCController = function (controllerOptions, controllerMVC) {
   var routes = [];
   var listeners = [];
   var options = controllerOptions;
   var mvc = controllerMVC;
-  /// Events:
-  /// hashchanged(hashTag) - detected a hash tag navigation, try to navigate a view if its a registered url
-  /// hashchangenoroute(hashTag) - hash naviation didn't match any of the registered mvc routes
-  /// routeadded(routeObject) - new route added to controller
-  /// showviewstart(viewName) - a request to show a view has began
-  /// showviewdone(viewObject) - a view was sucessfully shown
-  /// loadmodelstart(modelObject) - a model is going to be loaded with data
-  /// loadmodeldone(modelObject) - a model sucessfully loaded
-  /// loadmodelerror(errorObject) - a model was not sucessfully loaded
-  /// renderviewstart(viewObject) - a view is going to be rendered with a mdoel
-  /// renderviewdone(viewObject) - a view was sucessfully rendered
-  /// renderviewerror(errorObject) - a view was not sucessfully rendered
-  /// displayviewstart(viewObject) - view was rendered, and now we're ready to show it on the screen
-  /// View.displayviewdone(viewObject) - we have sucessfully shown the view on the screen
-  /// MVC.displayviewdone(viewObject) - we have sucessfully shown the view on the screen (all views)
-  /// displayviewerror(errorObject) - error while displaying view
-  /// displayviewrollbackstart(viewObject) - when we've had and error displaying, we show the previous one again
-  /// displayviewrollbackdone(viewObject) - done rolling back the display to the previous view
   return {
 
-    // @auto-fold here
+    /**
+     * The routes loaded into the MVC controller
+     * 
+     */
     get routes() {
       return routes;
     },
 
-    // @auto-fold here
+    /**
+     * This is the hash change listener that is used to listen for hash changes that would require view upates.
+     * 
+     * @param {Window} windowObject - The window object to listen on
+     */
     listenForHashChanges: function (windowObject) {
       var self = this;
       windowObject.addEventListener("hashchange", self.onhashchange, false);
     },
 
-    // @auto-fold here
+    
+    /**
+     * Sets all views and models rendered properties to false
+     * 
+     */
     invalidateTempViews: function () {
       var self = this;
       for (var i = 0; i < mvc.views.length; i++) {
@@ -424,8 +433,14 @@ var MVCController = function (controllerOptions, controllerMVC) {
       }
     },
 
-    // @auto-fold here
-    getViewFromHash: function (hash) {
+    
+    /**
+     * Given a hash, this function will return the route name
+     * 
+     * @param {String} hash - The hash to pull the route name from 
+     * @returns - The route
+     */
+    getRouteFromHash: function (hash) {
       var self = this;
       var viewName = hash;
       if (hash.indexOf("/") >= 0) {
@@ -434,7 +449,16 @@ var MVCController = function (controllerOptions, controllerMVC) {
       return viewName;
     },
 
-    // @auto-fold here
+    
+    /**
+     * Given a views html template, this function will import the CSS main document
+     * 
+     * Example:  
+     * 
+     *   <link class="mvc-csslink" rel="stylesheet" href="/css/today.css">
+     * 
+     * @param {any} viewObject 
+     */
     importCSS: function (viewObject) {
       var cssList = viewObject.css;
       for (var i = 0; i < cssList.length; i++) {
@@ -485,6 +509,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
       self.emit("hashchanged", window.location.hash);
       for (var i = 0; i < routes.length; i++) {
         var route = routes[i];
+        var paramObj = {};
         var routeName = route.pattern;
         if (route.pattern.indexOf("/") >= 0) {
           routeName = route.pattern.substring(0, route.pattern.indexOf("/"));
@@ -505,7 +530,21 @@ var MVCController = function (controllerOptions, controllerMVC) {
               }
             }
           }
-          self.showView(route.pattern, route.view, route.model, route.alwaysrender, params, route.function)
+          var props = [];
+          if (route.pattern.indexOf("/") >= 0) {
+            props = route.pattern.split("/");
+            for (var p = 1; p < props.length; p++) {
+              var prop = props[p];
+              prop = prop.replace(":", "");
+
+              var val = undefined;
+              if((p - 1) < params.length) {
+                val = params[p - 1];
+              } 
+              paramObj[prop] = val;
+            }
+          }
+          self.showView(route.pattern, route.view, route.model, route.alwaysrender, paramObj, route.function)
           return;
         }
       }
@@ -531,9 +570,13 @@ var MVCController = function (controllerOptions, controllerMVC) {
     },
 
     // @auto-fold here
-    showView: function (pattern, viewName, moduleName, alwaysRender, parameters, moduleLoadFunctionName) {
+    showView: function (pattern, viewName, moduleName, alwaysRender, paramObj, moduleLoadFunctionName) {
       var self = this;
       self.emit("showviewstart", viewName);
+      var parameters = [];
+      for(prop in paramObj) {
+        parameters.push(paramObj[prop]);
+      }
 
       /// Get the views we want
       var viewObject = mvc.getView(viewName);
@@ -561,6 +604,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
 
       viewObject.pattern = pattern;
       viewObject.hash = document.location.hash;
+      viewObject.parameters = paramObj;
 
       /// Adding the doneLoadingModule callback
       parameters.push(doneLoadingModule);
@@ -571,9 +615,15 @@ var MVCController = function (controllerOptions, controllerMVC) {
       try {
         modelObject[moduleLoadFunctionName].apply(modelObject, parameters);
       } catch(err) {
+        if(console.error) {
+          console.error(err);
+        } else {
+          console.log(err);
+        }
         self.emit("loadmodelerror", err);
         if(mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true && self.previousView !== undefined) {
           document.location.hash = self.previousView.hash;
+          return;
         }
       }
 
@@ -616,9 +666,9 @@ var MVCController = function (controllerOptions, controllerMVC) {
         if (self.currentView !== viewObject) {
           // viewObject.dom.style.opacity = "0";
         } else {
-          if (viewObject.rendered && viewObject.pattern === document.location.hash && options.refreshOnSameHash !== undefined && options.refreshOnSameHash === false) {
+          if (viewObject.rendered && viewObject.pattern === document.location.hash) {
+            mvc.view = viewObject;
             self.emit("displayviewdone", viewObject);
-            viewObject.emit("displayviewdone");
             return;
           }
         }
@@ -636,6 +686,9 @@ var MVCController = function (controllerOptions, controllerMVC) {
             }
             if(self.previousView !== undefined) {
               self.previousView.emit("unload", self.previousView);
+            }
+            if(self.previousView === undefined) {
+              self.previousView = self;
             }
             if(options.screenContainer.firstChild !== null) {
               self.previousView.dom = options.screenContainer.removeChild(options.screenContainer.firstChild);
@@ -662,15 +715,15 @@ var MVCController = function (controllerOptions, controllerMVC) {
           viewObject.target.view = viewObject;
         }
         // window.view = viewObject;
+        mvc.view = viewObject;
         self.emit("displayviewdone", viewObject);
-        view.emit("displayviewdone", viewObject);
         if(self.previousView != undefined && self.previousView !== null && self.previousView.afterDOMRemoval !== undefined) {
           self.previousView.afterDOMRemoval();
-        }
+        }            
         if (viewObject.afterShown !== undefined) {
           viewObject.afterShown();
         }
-
+        
       } catch (err) {
         self.emit("displayviewerror", err);
         self.currentView = self.previousView;
@@ -691,16 +744,23 @@ var MVCController = function (controllerOptions, controllerMVC) {
 
 
 /// View interface
-var View = function () {
+var View = function (options) {
   var view = this;
   view.css = [];
   view.listeners = [];
+  
+  if(typeof(options) === "string") {
+    eval(options);
+  }
+
 };
 
+/// Add event handlers for this view
 View.prototype.addEventListener = function(eventName, callBack) {
   return this.on(eventName, callBack);
 }
 
+/// Add event handlers for this view
 View.prototype.on = function(eventName, callBack) {
   var view = this;
 
@@ -720,10 +780,12 @@ View.prototype.on = function(eventName, callBack) {
   return eventListener.id;
 }
 
+/// Remove event handlers for this view
 View.prototype.removeEventListener = function(id) {
   return this.off(id);
 }
 
+/// Remove event handlers for this view
 View.prototype.off = function(id) {
   var view = this;
   for(var i = 0; i < view.listeners.length; i++) {
@@ -735,26 +797,32 @@ View.prototype.off = function(id) {
   return false;
 }
 
+/// Emit events
 View.prototype.emit = function(eventName, data) {
-  try {
-    var view = this;
-    for(var i = 0; i < view.listeners.length; i++) {
-      if(view.listeners[i].event === eventName) {
-        view.listeners[i].callBack(data);
+  var view = this;
+  for(var i = 0; i < view.listeners.length; i++) {
+    if(view.listeners[i].event === eventName) {
+      try {
+        view.listeners[i].callBack.apply(view, data);
+      } catch (ex) {
+        if(console.error) {
+          console.error(ex);
+        } else {
+          console.log(ex);
+        }
+        return;
       }
     }
-  } catch (ex) {
-    if(!console.error) {
-      console.error = console.log;
-    }
-    console.log("MVC Captured error:");
-    console.error(ex);
   }
 }
 
-// @auto-fold here
-/// Use this method to re-render a view
-/// The reloadModel parameter is useful in that it calls the models load function again with its original parameters
+/**
+ * Refreshes the view, and optional reloads the data model
+ * 
+ * The reloadModel parameter is useful in that it calls the models load function again with its original parameters
+ * 
+ * @param {bool} [reloadModel] Optional partameter, default is false to force reload on the model as well 
+ */
 View.prototype.refresh = function (reloadModel) {
   this.resetDOM();
   if (reloadModel) {
@@ -788,25 +856,43 @@ View.prototype.refresh = function (reloadModel) {
 
 };
 
-// @auto-fold here
+/**
+ * Resets the View.dom & View.sourceDOM properties to a clean copy of the html template for the view.
+ * 
+ */
 View.prototype.resetDOM = function () {
   var view = this;
   var tempDiv = document.createElement("div");
   tempDiv.innerHTML = view.htmlText;
-  view.dom = tempDiv.querySelector(".mvc-template").cloneNode(true);
-  view.sourceDOM = tempDiv.querySelector(".mvc-template").cloneNode(true);
+  view.dom = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
+  view.sourceDOM = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
 };
 
-// @auto-fold here
+
+/**
+ * This function is called by the controller when the view is going to be displayed.
+ * 
+ * It emits several events during the process of rendering:
+ *    MVC updatetitlestart - data = View - emitted before the documents title is updated
+ *    MVC updatetitledone - data = View - emitted after the documents title is updated
+ *    MVC viewrenderstart - data = View - emitted before the view is rendered, but after the title is updated
+ *    MVC viewrenderdone - data = View - emitted after the view has finished rendering and is in the DOM
+ *    View load - data = View - emitted after the view has finished rendering and is in the DOM
+ * 
+ * @param {Model} model - The model the view will use to render
+ * @param {Function} callBack - The callback to notify when the rendering is done
+ */
 View.prototype.render = function (model, callBack) {
 
   var view = this;
+  view.mvc.emit("updatetitlestart", view);
   if (view.title !== undefined) {
     document.title = view.title;
   } else {
     document.title = view.id;
   }
-  view.mvc.emit("viewrenderstart", null);
+  view.mvc.emit("updatetitledone", view);
+  view.mvc.emit("viewrenderstart", view);
   view.rendered = false;
   view.arguments = arguments;
   view.model = model;
@@ -821,6 +907,11 @@ View.prototype.render = function (model, callBack) {
         newDom = $p(view.dom).render(view.model.data, view.directive);
         view.dom = newDom[0];
       }
+    } else if(view.engine !== undefined && view.engine === "handlebars") {
+      var source   = view.htmlText;
+      var template = Handlebars.compile(source);
+      var templateHTML = template(view.model.data);
+      view.dom.innerHTML = templateHTML;
     } else {
       //console.log("No auto render engine specified");
     }
@@ -829,7 +920,7 @@ View.prototype.render = function (model, callBack) {
       view.postrender(view.model, function (err, retView) {
         retView.rendered = true;
         retView.mvc.emit("viewrenderdone", retView);
-        retView.emit("load", view);
+        retView.emit("load", retView);
         callBack(null, retView);
       });
     } else {
@@ -846,8 +937,19 @@ View.prototype.render = function (model, callBack) {
 };
 
 // @auto-fold here
-var Model = function () {
+var Model = function (options) {
   var model = this;
+  if(typeof(options) === "string") {
+    try {
+      eval(options)
+    } catch(ex) {
+      if(console.err) {
+        console.error(ex);
+      } else {
+        console.log(ex);
+      }
+    }
+  }
 };
 
 // @auto-fold here

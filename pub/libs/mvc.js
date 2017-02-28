@@ -1,9 +1,10 @@
 /// MVC library
+/// Version 1.5.1
 
 // @auto-fold here
 var MVC = function (options) {
   mvc = this;
-  mvc.version = "1.1.0";
+  mvc.version = "1.5.1";
 
   if (async === undefined) {
     var asyncErr = new Error("async library required for MVC");
@@ -294,8 +295,8 @@ MVC.prototype.addView = function (jsfile, callBack) {
                 view.htmlText = htmlResult;
                 var tempDiv = document.createElement("div");
                 tempDiv.innerHTML = view.htmlText;
-                view.dom = tempDiv.querySelector(".mvc-template").cloneNode(true);
-                view.sourceDOM = tempDiv.querySelector(".mvc-template").cloneNode(true);
+                view.dom = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
+                view.sourceDOM = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
 
                 // We got the html, load it into an iFrame so we can clone it when we need to
                 // var templateIframe = document.createElement("iframe");
@@ -365,43 +366,63 @@ MVC.prototype.getContent = function (url, async, callBack) {
   }
 };
 
-/// View interface
+/**
+ * MVC Controller
+ * 
+ * The MVC Controller is reponsible for handling route / hash changes that would require view updates.
+ * 
+ * Events:
+ *  hashchanged(hashTag) - detected a hash tag navigation, try to navigate a view if its a registered url
+ *  hashchangenoroute(hashTag) - hash naviation didn't match any of the registered mvc routes
+ *  routeadded(routeObject) - new route added to controller
+ *  showviewstart(viewName) - a request to show a view has began
+ *  showviewdone(viewObject) - a view was sucessfully shown
+ *  loadmodelstart(modelObject) - a model is going to be loaded with data
+ *  loadmodeldone(modelObject) - a model sucessfully loaded
+ *  loadmodelerror(errorObject) - a model was not sucessfully loaded
+ *  renderviewstart(viewObject) - a view is going to be rendered with a mdoel
+ *  renderviewdone(viewObject) - a view was sucessfully rendered
+ *  renderviewerror(errorObject) - a view was not sucessfully rendered
+ *  displayviewstart(viewObject) - view was rendered, and now we're ready to show it on the screen
+ *  displayviewdone(viewObject) - we have sucessfully shown the view on the screen
+ *  displayviewerror(errorObject) - error while displaying view
+ *  displayviewrollbackstart(viewObject) - when we've had and error displaying, we show the previous one again
+ *  displayviewrollbackdone(viewObject) - done rolling back the display to the previous view
+ * 
+ * @param {any} controllerOptions 
+ * @param {any} controllerMVC 
+ * @returns 
+ */
 var MVCController = function (controllerOptions, controllerMVC) {
   var routes = [];
   var listeners = [];
   var options = controllerOptions;
   var mvc = controllerMVC;
-  /// Events:
-  /// hashchanged(hashTag) - detected a hash tag navigation, try to navigate a view if its a registered url
-  /// hashchangenoroute(hashTag) - hash naviation didn't match any of the registered mvc routes
-  /// routeadded(routeObject) - new route added to controller
-  /// showviewstart(viewName) - a request to show a view has began
-  /// showviewdone(viewObject) - a view was sucessfully shown
-  /// loadmodelstart(modelObject) - a model is going to be loaded with data
-  /// loadmodeldone(modelObject) - a model sucessfully loaded
-  /// loadmodelerror(errorObject) - a model was not sucessfully loaded
-  /// renderviewstart(viewObject) - a view is going to be rendered with a mdoel
-  /// renderviewdone(viewObject) - a view was sucessfully rendered
-  /// renderviewerror(errorObject) - a view was not sucessfully rendered
-  /// displayviewstart(viewObject) - view was rendered, and now we're ready to show it on the screen
-  /// displayviewdone(viewObject) - we have sucessfully shown the view on the screen
-  /// displayviewerror(errorObject) - error while displaying view
-  /// displayviewrollbackstart(viewObject) - when we've had and error displaying, we show the previous one again
-  /// displayviewrollbackdone(viewObject) - done rolling back the display to the previous view
   return {
 
-    // @auto-fold here
+    /**
+     * The routes loaded into the MVC controller
+     * 
+     */
     get routes() {
       return routes;
     },
 
-    // @auto-fold here
+    /**
+     * This is the hash change listener that is used to listen for hash changes that would require view upates.
+     * 
+     * @param {Window} windowObject - The window object to listen on
+     */
     listenForHashChanges: function (windowObject) {
       var self = this;
       windowObject.addEventListener("hashchange", self.onhashchange, false);
     },
 
-    // @auto-fold here
+    
+    /**
+     * Sets all views and models rendered properties to false
+     * 
+     */
     invalidateTempViews: function () {
       var self = this;
       for (var i = 0; i < mvc.views.length; i++) {
@@ -412,8 +433,14 @@ var MVCController = function (controllerOptions, controllerMVC) {
       }
     },
 
-    // @auto-fold here
-    getViewFromHash: function (hash) {
+    
+    /**
+     * Given a hash, this function will return the route name
+     * 
+     * @param {String} hash - The hash to pull the route name from 
+     * @returns - The route
+     */
+    getRouteFromHash: function (hash) {
       var self = this;
       var viewName = hash;
       if (hash.indexOf("/") >= 0) {
@@ -422,7 +449,16 @@ var MVCController = function (controllerOptions, controllerMVC) {
       return viewName;
     },
 
-    // @auto-fold here
+    
+    /**
+     * Given a views html template, this function will import the CSS main document
+     * 
+     * Example:  
+     * 
+     *   <link class="mvc-csslink" rel="stylesheet" href="/css/today.css">
+     * 
+     * @param {any} viewObject 
+     */
     importCSS: function (viewObject) {
       var cssList = viewObject.css;
       for (var i = 0; i < cssList.length; i++) {
@@ -631,6 +667,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
           // viewObject.dom.style.opacity = "0";
         } else {
           if (viewObject.rendered && viewObject.pattern === document.location.hash) {
+            mvc.view = viewObject;
             self.emit("displayviewdone", viewObject);
             return;
           }
@@ -678,6 +715,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
           viewObject.target.view = viewObject;
         }
         // window.view = viewObject;
+        mvc.view = viewObject;
         self.emit("displayviewdone", viewObject);
         if(self.previousView != undefined && self.previousView !== null && self.previousView.afterDOMRemoval !== undefined) {
           self.previousView.afterDOMRemoval();
@@ -717,10 +755,12 @@ var View = function (options) {
 
 };
 
+/// Add event handlers for this view
 View.prototype.addEventListener = function(eventName, callBack) {
   return this.on(eventName, callBack);
 }
 
+/// Add event handlers for this view
 View.prototype.on = function(eventName, callBack) {
   var view = this;
 
@@ -740,10 +780,12 @@ View.prototype.on = function(eventName, callBack) {
   return eventListener.id;
 }
 
+/// Remove event handlers for this view
 View.prototype.removeEventListener = function(id) {
   return this.off(id);
 }
 
+/// Remove event handlers for this view
 View.prototype.off = function(id) {
   var view = this;
   for(var i = 0; i < view.listeners.length; i++) {
@@ -755,6 +797,7 @@ View.prototype.off = function(id) {
   return false;
 }
 
+/// Emit events
 View.prototype.emit = function(eventName, data) {
   var view = this;
   for(var i = 0; i < view.listeners.length; i++) {
@@ -773,9 +816,13 @@ View.prototype.emit = function(eventName, data) {
   }
 }
 
-// @auto-fold here
-/// Use this method to re-render a view
-/// The reloadModel parameter is useful in that it calls the models load function again with its original parameters
+/**
+ * Refreshes the view, and optional reloads the data model
+ * 
+ * The reloadModel parameter is useful in that it calls the models load function again with its original parameters
+ * 
+ * @param {bool} [reloadModel] Optional partameter, default is false to force reload on the model as well 
+ */
 View.prototype.refresh = function (reloadModel) {
   this.resetDOM();
   if (reloadModel) {
@@ -809,25 +856,43 @@ View.prototype.refresh = function (reloadModel) {
 
 };
 
-// @auto-fold here
+/**
+ * Resets the View.dom & View.sourceDOM properties to a clean copy of the html template for the view.
+ * 
+ */
 View.prototype.resetDOM = function () {
   var view = this;
   var tempDiv = document.createElement("div");
   tempDiv.innerHTML = view.htmlText;
-  view.dom = tempDiv.querySelector(".mvc-template").cloneNode(true);
-  view.sourceDOM = tempDiv.querySelector(".mvc-template").cloneNode(true);
+  view.dom = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
+  view.sourceDOM = tempDiv.querySelector(view.mvc.options.templateSelector).cloneNode(true);
 };
 
-// @auto-fold here
+
+/**
+ * This function is called by the controller when the view is going to be displayed.
+ * 
+ * It emits several events during the process of rendering:
+ *    MVC updatetitlestart - data = View - emitted before the documents title is updated
+ *    MVC updatetitledone - data = View - emitted after the documents title is updated
+ *    MVC viewrenderstart - data = View - emitted before the view is rendered, but after the title is updated
+ *    MVC viewrenderdone - data = View - emitted after the view has finished rendering and is in the DOM
+ *    View load - data = View - emitted after the view has finished rendering and is in the DOM
+ * 
+ * @param {Model} model - The model the view will use to render
+ * @param {Function} callBack - The callback to notify when the rendering is done
+ */
 View.prototype.render = function (model, callBack) {
 
   var view = this;
+  view.mvc.emit("updatetitlestart", view);
   if (view.title !== undefined) {
     document.title = view.title;
   } else {
     document.title = view.id;
   }
-  view.mvc.emit("viewrenderstart", null);
+  view.mvc.emit("updatetitledone", view);
+  view.mvc.emit("viewrenderstart", view);
   view.rendered = false;
   view.arguments = arguments;
   view.model = model;
@@ -855,7 +920,7 @@ View.prototype.render = function (model, callBack) {
       view.postrender(view.model, function (err, retView) {
         retView.rendered = true;
         retView.mvc.emit("viewrenderdone", retView);
-        retView.emit("load", view);
+        retView.emit("load", retView);
         callBack(null, retView);
       });
     } else {
