@@ -5,8 +5,10 @@
     <!-- pure js engine, which works with mvc -->
     <script src="/libs/pure.min.js" type="text/javascript"></script>
     <script src="/libs/async.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.js" type="text/javascript"></script>
+    <script src="/libs/ejs.js" type="text/javascript"></script>
+    <script src="/libs/handlebars.js" type="text/javascript"></script>
     <script src="/libs/mvc.js" type="text/javascript"></script>
+
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css" crossorigin="anonymous">    
     <script>
       var mvc = null;
@@ -18,9 +20,10 @@
   <body>
     <div style="padding:40px;">
     <h3>MVC Sample</h3>
+    <a href="#dom" class="button-success pure-button" >Show DOM Example - (Uses DOM Manipulation)</a>
     <a href="#home" class="pure-button pure-button-primary" >Show Home - (Uses Pure.js Engine)</a>
-    <a href="#today" class="button-success pure-button" >Show Today - (Uses DOM Manipulation)</a>
     <a href="#handle" class="pure-button pure-button-secondary" >Show Handlebars - (Uses Handlebars Engine)</a>
+    <a href="#ejs" class="pure-button pure-button-secondary" >Show EJS - (Uses EJS Engine)</a>
     </div>
     <hr style="width: 80%; border: 1px solid #cecece;">
     <div id="mvc-screens" style="padding:40px; "></div>

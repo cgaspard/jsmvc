@@ -1,5 +1,5 @@
 
-model.id = "home";
+model.id = "pure";
 
 model.load = function(id, name, test, callBack) {
   var model = this;

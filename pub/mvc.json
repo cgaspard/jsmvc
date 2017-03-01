@@ -6,19 +6,23 @@
     "screenContainerSelector": "#mvc-screens",
     "cssContainerSelector": "#mvc-csscontainer",
     "templateSelector": ".mvc-template",
-    "views": ["/mvc/home.view.js", "/mvc/today.view.js", "/mvc/handle.view.js"],
-    "models": ["/mvc/home.model.js", "/mvc/today.model.js", "/mvc/handle.model.js"],
+    "views": ["/mvc/dom.view.js", "/mvc/pure.view.js", "/mvc/handle.view.js", "/mvc/ejs.view.js"],
+    "models": ["/mvc/dom.model.js", "/mvc/pure.model.js", "/mvc/handle.model.js", "/mvc/ejs.model.js"],
     "routes": [{
-        "pattern": "#home/:id/test/:name",
-        "view": "home",
-        "model": "home"
+        "pattern": "#dom",
+        "view": "dom",
+        "model": "dom"
     }, {
-        "pattern": "#today",
-        "view": "today",
-        "model": "today"
+        "pattern": "#pure/:id/test/:name",
+        "view": "pure",
+        "model": "pure"
     }, {
         "pattern": "#handle",
         "view": "handle",
         "model": "handle"
+    }, {
+        "pattern": "#ejs",
+        "view": "ejs",
+        "model": "ejs"
     }]
 }

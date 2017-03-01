@@ -5,16 +5,23 @@
 var MVC = function (options) {
   mvc = this;
   mvc.version = "1.5.1";
+  engines = [];
 
   if (async === undefined) {
     var asyncErr = new Error("async library required for MVC");
     throw asyncErr;
   }
-  if ($p === undefined) {
-    console.log("Warning: pure.js is not loaded, please load if you want to use pure.js template engine");
+  if ($p === undefined) { } else {
+    engines.push("pure.js");
+    console.log("pure.js template engine found.");
   }
-  if(Handlebars === undefined) {
-    console.log("Warning: Handlebars is not loaded, please load if you want to use handlebars template engine");
+  if(Handlebars === undefined) {} else {
+    engines.push("handlebars");
+    console.log("Handlebars template engine found.");
+  }
+  if(EJS === undefined) { } else {
+    engines.push("ejs");
+    console.log("EJS template engine found.");
   }
 
   mvc.views = [];
@@ -912,6 +919,9 @@ View.prototype.render = function (model, callBack) {
       var template = Handlebars.compile(source);
       var templateHTML = template(view.model.data);
       view.dom.innerHTML = templateHTML;
+    } else if(view.engine !== undefined && view.engine === "ejs") {
+      var source   = view.htmlText;
+      view.dom.innerHTML =  new EJS({text:source}).render(view.model.data);
     } else {
       //console.log("No auto render engine specified");
     }

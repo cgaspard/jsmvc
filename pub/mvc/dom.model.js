@@ -1,5 +1,5 @@
 
-model.id = "today";
+model.id = "dom";
 
 model.load = function(callBack) {
   var model = this;

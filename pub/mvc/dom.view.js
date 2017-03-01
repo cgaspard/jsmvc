@@ -1,13 +1,13 @@
 
-this.id = "today";
-this.html = "/mvc/today.htm";
-this.title = "Today";
+this.id = "dom";
+this.html = "/mvc/dom.htm";
+this.title = "DOM Manipulation Example";
 
 /// Auto rendering via template engine happens first, this is where you can do stuff after that
 this.addEventListener("load", function() {
   // var this = this;
   var testDiv = document.createElement("div");
-  testDiv.innerHTML = 'Hello There from Render Function of Today';
+  testDiv.innerHTML = 'This message was inserted by using DOM manipulation.';
   this.dom.appendChild(testDiv);
 
   this.dom.querySelector("#year").innerHTML = this.model.data.year;
