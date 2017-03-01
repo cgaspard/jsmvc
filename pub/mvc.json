@@ -13,7 +13,7 @@
         "view": "dom",
         "model": "dom"
     }, {
-        "pattern": "#pure/:id/test/:name",
+        "pattern": "#pure/:id/:name",
         "view": "pure",
         "model": "pure"
     }, {

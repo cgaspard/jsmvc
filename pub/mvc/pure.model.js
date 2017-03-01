@@ -1,7 +1,7 @@
 
 model.id = "pure";
 
-model.load = function(id, name, test, callBack) {
+model.load = function(id, name, callBack) {
   var model = this;
   model.data = {
     "name":"David",

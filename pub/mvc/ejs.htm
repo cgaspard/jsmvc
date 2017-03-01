@@ -1,8 +1,11 @@
-<div id="handleScreen" class="mvc-template">
+<div id="ejsScreen" class="mvc-template">
 <div class="entry">
   <h1><%= title %></h1>
   <div class="body">
     <%= ejsbody %>
+    <% if(showit) { %>
+      I can see it.
+    <% } %>
   </div>
 </div>
 </div>
