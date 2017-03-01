@@ -1,6 +1,6 @@
 ### JSMVC - Javascript Clientside MVC
 
-#### The old cumentation is out of date so I removed it.  Have a look at the sample for now to get a better understanding.
+#### Documentation was out of date so I removed it.  Have a look at the sample for now to get a better understanding.
 
 JSMVC is an MVC library that works by loading javascript based models, views and html based templates.
 
