@@ -1,4 +1,3 @@
-
 model.id = "pure";
 
 model.load = function(id, name, callBack) {

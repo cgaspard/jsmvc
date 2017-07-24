@@ -9,19 +9,18 @@ var packageJSON = require("./package.json");
 console.log(packageJSON.name + " Version: " + packageJSON.version);
 console.log("Description: " + packageJSON.description);
 
-var restify = require('restify');
+var express = require("express");
+const app = express();
+app.use(express.static('pub'))
 
-var staticserver = require("./libs/staticserver");
+app.get('/', function (req, res) {
+  res.redirect('/home');
+});
 
-staticserver.setContentFolder("/pub");
+app.get('/home', function(req, res) {
+  res.sendfile(__dirname + '/pub/index.htm');
+})
 
-var restServer = restify.createServer();
-restServer.use(restify.bodyParser());
-restServer.use(restify.gzipResponse());
-restServer.use(restify.conditionalRequest());
-restServer.use(staticserver.checkCache);
-restServer.get(/^\/.*/, staticserver.getStaticContent);
-
-restServer.listen(8585, function () {
-  console.log('jsMVC listening at %s', restServer.url);
+app.listen(8585, function () {
+  console.log('jsMVC listening at %s', app.url);
 });

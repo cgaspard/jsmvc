@@ -1,7 +1,6 @@
 
-model.id = "dom";
-
-model.load = function(callBack) {
+this.id = "dom";
+this.load = function(callBack) {
   var model = this;
   var today = new Date();
   model.data = {
@@ -13,4 +12,8 @@ model.load = function(callBack) {
     "helloMessage": "Whats up doc?"
   }
   callBack(null, model);
+}
+
+this.save = function(callBack) {
+  
 }

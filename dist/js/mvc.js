@@ -740,6 +740,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
           options.screenContainer.innerHTML = oldHTML;
           self.emit("displayviewrollbackdone", self.previousView);
         }
+        throw err;
       }
       // if (viewObject.target === undefined) {
       //     self.setActivePageButton();

@@ -930,13 +930,13 @@ View.prototype.render = function (model, callBack) {
       view.postrender(view.model, function (err, retView) {
         retView.rendered = true;
         retView.mvc.emit("viewrenderdone", retView);
-        // retView.emit("load", retView);
+        retView.emit("load", retView);
         callBack(null, retView);
       });
     } else {
       view.rendered = true;
       view.mvc.emit("viewrenderdone", view);
-      // view.emit("load", view);
+      view.emit("load", view);
       callBack(null, view);
     }
   } catch (err) {
@@ -946,7 +946,7 @@ View.prototype.render = function (model, callBack) {
       console.log(err);
     }
     view.mvc.emit("viewrenderdone", view);
-    // view.emit("load", view);
+    view.emit("load", view);
     callBack(err);
   }
 };

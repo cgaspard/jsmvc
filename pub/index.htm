@@ -2,17 +2,27 @@
 <html lang="en">
   <head id="mvc-csscontainer">
     <title>MVC Test</title>
-    <!-- pure js engine, which works with mvc -->
-    <script src="/libs/pure.min.js" type="text/javascript"></script>
+    
+    <!-- Required for mvc to work properly -->
     <script src="/libs/async.min.js" type="text/javascript"></script>
+
+    <!-- Template Engines -->
+    <script src="/libs/pure.min.js" type="text/javascript"></script>
     <script src="/libs/ejs.js" type="text/javascript"></script>
     <script src="/libs/handlebars.js" type="text/javascript"></script>
+
+    <!-- mvc Library -->
     <script src="/libs/mvc.js" type="text/javascript"></script>
 
+    <!-- Yahoo https://purecss.io/ -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.6.2/pure-min.css" crossorigin="anonymous">    
+
+    <!-- JSMVC Initialization Code -->
     <script>
       var mvc = null;
       document.addEventListener("DOMContentLoaded", function(event) {
+        
+        /// Load MVC library using configuration JSON
         mvc = new MVC("/mvc.json");
       })
     </script>

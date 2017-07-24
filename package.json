@@ -2,7 +2,7 @@
   "name": "JSMVC",
   "description": "Sample JS MVC Setup",
   "version": "1.5.1",
-  "author" : "Corey Gaspard <cgaspard@gmail.com>",
+  "author": "Corey Gaspard <cgaspard@gmail.com>",
   "scripts": {
     "start": "node app.js"
   },
@@ -11,11 +11,11 @@
   "private": false,
   "contributors": [
     {
-      "name":"Corey Gaspard",
+      "name": "Corey Gaspard",
       "email": "cgaspard@gmail.com"
     }
   ],
   "dependencies": {
-    "restify": "*"
+    "express": "^4.15.3"
   }
 }

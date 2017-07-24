@@ -3,8 +3,8 @@ this.id = "dom";
 this.html = "/mvc/dom.htm";
 this.title = "DOM Manipulation Example";
 
-/// Auto rendering via template engine happens first, this is where you can do stuff after that
-this.addEventListener("load", function() {
+/// Auto rendering via template engine happens first, this is where you can manipulate the dom after that
+this.on("load", function() {
   // var this = this;
   var testDiv = document.createElement("div");
   testDiv.innerHTML = 'This message was inserted by using DOM manipulation.';
@@ -17,5 +17,4 @@ this.addEventListener("load", function() {
   this.dom.querySelector("#minutes").innerHTML = this.model.data.minutes;
 
   this.dom.querySelector("#helloMessageContainer").innerHTML = this.model.data.helloMessage;
-
 });

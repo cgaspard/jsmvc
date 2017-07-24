@@ -3,10 +3,10 @@ view.engine = "ejs";
 view.title = "EJS Demo";
 view.html = "/mvc/ejs.htm";
 
-view.addEventListener("load", function() {
+view.beforeShown = function(thisview) {
+    // This will call before its in the DOM
+}
 
-});
-
-view.dosomething = function() {
-    alert("test");
-};
+view.afterShown = function() {
+    /// After its in the DOM
+}

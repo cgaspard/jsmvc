@@ -4,8 +4,11 @@ this.html = "/mvc/pure.htm";
 this.title = "Home";
 this.directive = {
   ".userName": "name",
+  ".userName@id": "something",
   ".userAge": "age",
-  "#combined": "#{name} - #{age}"
+  "#combined": "#{name} - #{age}",
+  ".userName@style+": " display:none;",
+  "#something":""
 };
 
 this.addEventListener("load", function() {

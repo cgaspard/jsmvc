@@ -1,13 +1,12 @@
 
-this.id = "ejs";
+model.id = "ejs";
 
-this.load = function(callBack) {
+model.load = function(callBack) {
   var model = this;
   model.data = {
     "title":"EJS works",
     "showit": true,
-    "ejsbody": "This is some text rendered by the EJS engine.",
-    "functionname": "mvc.view.dosomething"
+    "ejsbody": "This is some text rendered by the EJS engine."
   }
   callBack(null, model);
 }
