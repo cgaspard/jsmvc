@@ -1,8 +1,6 @@
 {
-    "mvcRoot": "/",
-    "autoInit": true,
-    "listenForHashChanges": true,
     "loadHashOnInit": true,
+    "defaultHash": "#dom",
     "screenContainerSelector": "#mvc-screens",
     "cssContainerSelector": "#mvc-csscontainer",
     "templateSelector": ".mvc-template",

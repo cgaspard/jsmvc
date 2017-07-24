@@ -12,15 +12,15 @@ var MVC = function (options) {
     throw asyncErr;
   }
   if ($p === undefined) { } else {
-    engines.push("pure.js");
+    engines.pure = $p;
     console.log("pure.js template engine found.");
   }
   if(Handlebars === undefined) {} else {
-    engines.push("handlebars");
+    engines.handlebars = Handlebars;;
     console.log("Handlebars template engine found.");
   }
   if(EJS === undefined) { } else {
-    engines.push("ejs");
+    engines.ejs = EJS;
     console.log("EJS template engine found.");
   }
 
@@ -58,7 +58,7 @@ var MVC = function (options) {
         mvc.controller.addRoute(route.pattern, route.view, route.model, route.alwaysrender, route.function)
       }
     }
-    if (mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true) {
+    if (mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) {
       mvc.controller.listenForHashChanges(window);
     }
     if (mvc.options.autoInit === undefined || mvc.options.autoInit === true) {
@@ -158,8 +158,12 @@ MVC.prototype.init = function (callBack) {
         if (doneCallback !== undefined) {
           doneCallback();
         }
-        if(mvc.options.loadHashOnInit) {
-          mvc.controller.onhashchange();
+        if(mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) {
+          /// Enable the hash listener by default
+          mvc.listenForHashChanges();
+        }
+        if(mvc.options.defaultHash) {
+          window.location.hash = mvc.options.defaultHash;
         }
       }
     }
@@ -422,6 +426,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
      */
     listenForHashChanges: function (windowObject) {
       var self = this;
+      if(windowObject === undefined) { windowObject = window; }
       windowObject.addEventListener("hashchange", self.onhashchange, false);
     },
 
@@ -556,7 +561,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
         }
       }
       self.emit("hashchangenoroute", window.location.hash)
-      if(mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true && self.previousView !== undefined) {
+      if((mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) && self.previousView !== undefined) {
         document.location.hash = self.previousView.hash;
       }
 
@@ -628,7 +633,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
           console.log(err);
         }
         self.emit("loadmodelerror", err);
-        if(mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true && self.previousView !== undefined) {
+        if((mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) && self.previousView !== undefined) {
           document.location.hash = self.previousView.hash;
           return;
         }
@@ -645,7 +650,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
             viewObject.render(returnedModel, doneRenderingView);
           } catch (err) {
             self.emit("renderviewerror", err);
-            if(mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true && self.previousView !== undefined) {
+            if((mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) && self.previousView !== undefined) {
               document.location.hash = self.previousView.hash;
             }
           }
@@ -910,19 +915,22 @@ View.prototype.render = function (model, callBack) {
 
     /// If the render function is implemented, then call that one
     if (view.engine !== undefined && view.engine === "pure") {
+      if(!view.mvc.engines.pure) { throw "pure.js engine not loaded"; }
       var newDom;
       if (view.directive !== undefined) {
-        newDom = $p(view.dom).render(view.model.data, view.directive);
+        newDom = view.mvc.engines.pure(view.dom).render(view.model.data, view.directive);
         view.dom = newDom[0];
       }
     } else if(view.engine !== undefined && view.engine === "handlebars") {
+      if(!view.mvc.engines.handlebars) { throw "Handlebars engine not loaded"; }
       var source   = view.htmlText;
-      var template = Handlebars.compile(source);
+      var template = view.mvc.engines.handlebars.compile(source);
       var templateHTML = template(view.model.data);
       view.dom.innerHTML = templateHTML;
     } else if(view.engine !== undefined && view.engine === "ejs") {
+      if(!view.mvc.engines.ejs) { throw "Handlebars engine not loaded"; }
       var source   = view.htmlText;
-      view.dom.innerHTML =  new EJS({text:source}).render(view.model.data);
+      view.dom.innerHTML =  new view.mvc.engines.ejs({text:source}).render(view.model.data);
     } else {
       //console.log("No auto render engine specified");
     }
@@ -967,6 +975,10 @@ var Model = function (options) {
     }
   }
 };
+
+Model.prototype.load = function() {
+
+}
 
 // @auto-fold here
 Model.prototype.reload = function () {

@@ -58,7 +58,7 @@ var MVC = function (options) {
         mvc.controller.addRoute(route.pattern, route.view, route.model, route.alwaysrender, route.function)
       }
     }
-    if (mvc.options.listenForHashChanges !== undefined && mvc.options.listenForHashChanges === true) {
+    if (mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) {
       mvc.controller.listenForHashChanges(window);
     }
     if (mvc.options.autoInit === undefined || mvc.options.autoInit === true) {
@@ -158,8 +158,8 @@ MVC.prototype.init = function (callBack) {
         if (doneCallback !== undefined) {
           doneCallback();
         }
-        if(mvc.options.loadHashOnInit) {
-          mvc.controller.onhashchange();
+        if(mvc.options.defaultHash) {
+          window.location.hash = mvc.options.defaultHash;
         }
       }
     }

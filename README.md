@@ -58,10 +58,9 @@ Here is an example configuration that mvc.config.js for JSMVC:
 
 ```json
 {
-    "mvcRoot": "/",                                    /// The path to the root of the web applications
-    "autoInit": true,                                  /// Tells MVC that you want it to preload views, models and templates into memory
-    "listenForHashChanges": true,                      /// MVC will liseten for hash changes in the URL and change the view / model that is associated in the routes.
-    "loadHashOnInit": true,                            /// MVC will render the first hash on DOMContentComplete
+    "defaultHash": "#dom",                             /// The initial route to load
+    "autoInit": true,                                  /// Default: true, Tells MVC that you want it to preload views, models and templates into memory
+    "listenForHashChanges": true,                      /// Default: true, MVC will liseten for hash changes in the URL and change the view / model that is associated in the routes.
     "screenContainerSelector": "#mvc-screens",         /// This is where MVC will display the rendered view / template
     "cssContainerSelector": "#mvc-csscontainer",       /// If html templates contain CSS tags, they will be loaded into the DOM inside this object
     "templateSelector": ".mvc-template",               /// Given a html page, this points to the content that will be put into the view
