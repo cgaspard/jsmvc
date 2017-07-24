@@ -1,10 +1,9 @@
 /// MVC library
-/// Version 1.5.1
+/// Version 1.5.2
 
-// @auto-fold here
 var MVC = function (options) {
   mvc = this;
-  mvc.version = "1.5.1";
+  mvc.version = "1.5.2";
   engines = [];
 
   if (async === undefined) {
