@@ -55,7 +55,7 @@ var MVC = function (options) {
     if (mvc.options.routes !== undefined && mvc.options.routes.length > 0) {
       for (var r = 0; r < mvc.options.routes.length; r++) {
         var route = mvc.options.routes[r];
-        mvc.controller.addRoute(route.pattern, route.view, route.model, route.alwaysrender, route.function)
+        mvc.controller.addRoute(route.pattern, route.viewID, route.modelID, route.alwaysrender, route.function)
       }
     }
     if (mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) {
@@ -158,7 +158,9 @@ MVC.prototype.init = function (callBack) {
         if (doneCallback !== undefined) {
           doneCallback();
         }
-        if(mvc.options.defaultHash) {
+        if(mvc.options.defaultHash === window.location.hash) {
+          mvc.controller.onhashchange();
+        } else if(mvc.options.defaultHash) {
           window.location.hash = mvc.options.defaultHash;
         }
       }
@@ -551,7 +553,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
               paramObj[prop] = val;
             }
           }
-          self.showView(route.pattern, route.view, route.model, route.alwaysrender, paramObj, route.function)
+          self.showView(route, route.view, route.model, route.alwaysrender, paramObj, route.function)
           return;
         }
       }
@@ -577,7 +579,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
     },
 
     // @auto-fold here
-    showView: function (pattern, viewName, moduleName, alwaysRender, paramObj, moduleLoadFunctionName) {
+    showView: function (route, viewName, moduleName, alwaysRender, paramObj, moduleLoadFunctionName) {
       var self = this;
       self.emit("showviewstart", viewName);
       var parameters = [];
@@ -609,7 +611,7 @@ var MVCController = function (controllerOptions, controllerMVC) {
         moduleLoadFunctionName = "load";
       }
 
-      viewObject.pattern = pattern;
+      viewObject.pattern = route.pattern;
       viewObject.hash = document.location.hash;
       viewObject.parameters = paramObj;
 

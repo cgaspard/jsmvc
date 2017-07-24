@@ -6,21 +6,10 @@
     "templateSelector": ".mvc-template",
     "views": ["/mvc/dom.view.js", "/mvc/pure.view.js", "/mvc/handle.view.js", "/mvc/ejs.view.js"],
     "models": ["/mvc/dom.model.js", "/mvc/pure.model.js", "/mvc/handle.model.js", "/mvc/ejs.model.js"],
-    "routes": [{
-        "pattern": "#dom",
-        "view": "dom",
-        "model": "dom"
-    }, {
-        "pattern": "#pure/:id/:name",
-        "view": "pure",
-        "model": "pure"
-    }, {
-        "pattern": "#handle",
-        "view": "handle",
-        "model": "handle"
-    }, {
-        "pattern": "#ejs",
-        "view": "ejs",
-        "model": "ejs"
-    }]
+    "routes": [
+        { "pattern": "#dom", "viewID": "dom", "modelID": "dom", "alwaysRender": false}, 
+        { "pattern": "#pure/:id/:name", "viewID": "pure", "modelID": "pure" },
+        { "pattern": "#handle", "viewID": "handle", "modelID": "handle" }, 
+        { "pattern": "#ejs", "viewID": "ejs", "modelID": "ejs" }
+    ]
 }

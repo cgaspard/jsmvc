@@ -54,7 +54,7 @@ var MVC = function (options) {
     if (mvc.options.routes !== undefined && mvc.options.routes.length > 0) {
       for (var r = 0; r < mvc.options.routes.length; r++) {
         var route = mvc.options.routes[r];
-        mvc.controller.addRoute(route.pattern, route.view, route.model, route.alwaysrender, route.function)
+        mvc.controller.addRoute(route.pattern, route.viewID, route.modelID, route.alwaysrender, route.function)
       }
     }
     if (mvc.options.listenForHashChanges === undefined || mvc.options.listenForHashChanges === true) {
